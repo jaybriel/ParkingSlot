@@ -11,3 +11,9 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+table,td,th {
+  border-width:"1px";
+  border-color:"#aaaaaa";
+  border-style:'solid';
+}
