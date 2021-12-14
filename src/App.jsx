@@ -1,4 +1,6 @@
 import React, { useState, useRef } from "react";
+import { compute } from './helpers/compute'
+import { checkSize } from './helpers/checkSize'
 import "./App.css";
 
 const App = () => {
@@ -7,15 +9,16 @@ const App = () => {
   const [isUnpark, setIsUnpark] = useState(false);
   const [vehicleSize, setVehicleSize] = useState("");
   const [parkingEntry, setParkingEntry] = useState("");
+
+
   const getRandomSize = () => {
-    // SP = 0, MP = 1, LP = 2
     const max = 2
     const min = 0
     const descriptors = ['SP', 'MP', 'LP']
     const size = Math.round(Math.random() * (max - min) + min)
     const desc = descriptors[size]
     return desc;
-}
+  }
 
   const [parkingA, setParkingA] = useState([
     {
@@ -131,23 +134,7 @@ const App = () => {
     },
   ]);
 
-  const checkSize = (vehicleSize, parkingSize) => {
-    if (
-      vehicleSize === "S" &&
-      (parkingSize === "LP" || parkingSize === "MP" || parkingSize === "SP")
-    ) {
-      return true;
-    } else if (
-      vehicleSize === "M" &&
-      (parkingSize === "MP" || parkingSize === "LP")
-    ) {
-      return true;
-    } else if (vehicleSize === "L" && parkingSize === "LP") {
-      return true;
-    } else {
-      return false;
-    }
-  };
+
 
 
   const onUnPark = () => {
@@ -240,6 +227,8 @@ const App = () => {
           }
 
           break;
+        default:
+          alert('valid choice');
       }
     }
   };
@@ -313,6 +302,59 @@ const App = () => {
     });
   };
 
+  const renderParkingAMap = () => {
+    return (
+      <table>
+        <thead>
+          <td colSpan="3"><h1>Parking A</h1></td>
+        </thead>
+        <tr>
+          <td></td>
+          <td>occupied</td>
+          <td>parking size</td>
+          <td>start time</td>
+        </tr>
+        {renderParkingA()}
+      </table>
+    )
+  }
+
+
+  const renderParkingBMap = () => {
+    return (
+      <table>
+        <thead>
+          <td colSpan="3"><h1>Parking B</h1></td>
+        </thead>
+        <tr>
+          <td></td>
+          <td>occupied</td>
+          <td>parking size</td>
+          <td>start time</td>
+        </tr>
+        {renderParkingB()}
+      </table>
+    )
+  }
+
+  const renderParkingCMap = () => {
+    return (
+      <table>
+        <thead>
+          <td colSpan="3"><h1>Parking C</h1></td>
+        </thead>
+        <tr>
+          <td></td>
+          <td>occupied</td>
+          <td>parking size</td>
+          <td>start time</td>
+        </tr>
+
+        {renderParkingC()}
+      </table>
+    )
+  }
+
   const onSelectUnparkVehicle = (unparkIndex) => {
     let isFoundA = parkingA.find((item) => item.parkingSlot === unparkIndex);
     let isFoundB = parkingB.find((item) => item.parkingSlot === unparkIndex);
@@ -372,44 +414,8 @@ const App = () => {
     }
   };
 
-  const compute = (size, totalTime) => {
-    let remainingTime = totalTime;
-    let t24 = 1000 * 60 * 24;
-    let t1h = 1000 * 60;
-    let charges = 0;
-
-    var hourlyCharge = 0;
-
-    if (size === "SP") {
-      hourlyCharge = 20;
-    } else if (size === "MP") {
-      hourlyCharge = 60;
-    } else if (size === "LP") {
-      hourlyCharge = 100;
-    }
-
-    if (remainingTime > t24) {
-      let n24 = parseInt(totalTime / t24);
-      charges += n24 * 5000;
-      remainingTime -= n24 * t24;
-    }
-
-    if (remainingTime > t1h * 3) {
-      remainingTime -= t1h * 3;
-      charges += 40;
-    }
-
-    if (remainingTime > 0) {
-      let remainingHours = Math.ceil(remainingTime / t1h);
-      charges += remainingHours * hourlyCharge;
-    }
-
-    // return total charges
-    return charges;
-  };
-
-  return (
-    <>
+  const renderVehicleSizeRadio = () => {
+    return (
       <div>
         Small Vehicle
         <input
@@ -439,7 +445,12 @@ const App = () => {
           disabled={isUnpark}
         />
       </div>
-      <div>
+    )
+  }
+
+  const renderEntryRadio = () => {
+    return (
+      <>
         Entry A
         <input
           type="radio"
@@ -474,6 +485,15 @@ const App = () => {
           disabled={isUnpark}
         />
         <br />
+      </>
+    )
+  }
+
+  return (
+    <>
+      <div>
+        {renderVehicleSizeRadio()}
+        {renderEntryRadio()}
         <button type="button" onClick={() => onPark(vehicleSize, parkingEntry)}>
           Park
         </button>
@@ -481,56 +501,19 @@ const App = () => {
           Select to Unpark Vehicle
         </button>
       </div>
-
-      <table>
-        <thead>
-          <td colSpan ="3"><h1>Parking A</h1></td>
-          </thead>
-        <tr>
-          <td></td>
-          <td>occupied</td>
-          <td>parking size</td>
-          <td>start time</td>
-        </tr>
-        {renderParkingA()}
-        </table>
-        <table>
-        <thead>
-          <td colSpan ="3"><h1>Parking B</h1></td>
-          </thead>
-        <tr>
-          <td></td>
-          <td>occupied</td>
-          <td>parking size</td>
-          <td>start time</td>
-        </tr>
-        {renderParkingB()}
-        </table>
-        <table>
-        <thead>
-          <td colSpan ="3"><h1>Parking C</h1></td>
-          </thead>
-        <tr>
-          <td></td>
-          <td>occupied</td>
-          <td>parking size</td>
-          <td>start time</td>
-        </tr>
-
-        {renderParkingC()}
-        </table>
-        
-
-        {isUnpark ? (
-          <button
-            type="button"
-            onClick={() => onSelectUnparkVehicle(unparkIndex)}
-          >
-            Unpark selected vehicle
-          </button>
-        ) : (
-          ""
-        )}
+      {renderParkingAMap()}
+      {renderParkingBMap()}
+      {renderParkingCMap()}
+      {isUnpark ? (
+        <button
+          type="button"
+          onClick={() => onSelectUnparkVehicle(unparkIndex)}
+        >
+          Unpark selected vehicle
+        </button>
+      ) : (
+        ""
+      )}
 
     </>
   );
